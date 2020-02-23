@@ -106,27 +106,40 @@ function StringEdit ({
   const handleDrop = React.useCallback((acceptedFiles) => {
     fileAsDatURI.current = fileAsDatURI.current || {};
     const reader = new FileReader();
-    reader.addEventListener("load", function () {
+    reader.addEventListener("load",  () => {
       fileAsDatURI.current[acceptedFiles[0].name] = reader.result;
       setFiles((prevFiles) => [...prevFiles].concat(acceptedFiles));
       setAltNames([...altNames, '']);
-      onChange(files);
+      onChangeProps();
     }, false);
 
     reader.readAsDataURL(acceptedFiles[0]);
 
   }, []);
 
+  const onChangeProps = () => {
+    const newData = [];
+    files.forEach((file, i) => {
+      const d = {
+        fileContent: fileAsDatURI[file.name],
+        name: file.name,
+        alt: altNames[i],
+      };
+      newData.push(d);
+    });
+    onChange(newData);
+  };
+
   const handleRemoveAll = () => {
     setFiles([]);
-    onChange([]);
+    onChangeProps();
   };
 
   const handleRemove = (i) => {
     const newList = [...files];
     newList.splice(i, 1);
     setFiles(newList);
-    onChange(newList);
+    onChangeProps(newList);
   };
 
   const onAltChange = (i, val) => {
