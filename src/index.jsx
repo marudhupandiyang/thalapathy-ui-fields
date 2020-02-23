@@ -5,6 +5,7 @@ const BooleanView = require('./Boolean');
 const JSONBView = require('./JSONB');
 const AutoIncrementView = require('./AutoIncrement');
 const PasswordView = require('./Password');
+const FileView = require('./File');
 
 module.exports = {
   String: StringView,
@@ -14,4 +15,5 @@ module.exports = {
   JSONB: JSONBView,
   AutoIncrement: AutoIncrementView,
   Password: PasswordView,
+  File: FileView,
 };
