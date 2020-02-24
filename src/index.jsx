@@ -1,6 +1,7 @@
 const StringView = require('./String');
 const DateTimeView = require('./DateTime');
 const IntegerView = require('./Integer');
+const DecimalView = require('./Decimal');
 const BooleanView = require('./Boolean');
 const JSONBView = require('./JSONB');
 const AutoIncrementView = require('./AutoIncrement');
@@ -11,6 +12,7 @@ module.exports = {
   String: StringView,
   DateTime: DateTimeView,
   Integer: IntegerView,
+  Decimal: DecimalView,
   Boolean: BooleanView,
   JSONB: JSONBView,
   AutoIncrement: AutoIncrementView,
