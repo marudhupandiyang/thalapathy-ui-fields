@@ -55,10 +55,8 @@ const useStyles = makeStyles((theme) => ({
     width: 130,
   },
   previewImage: {
-    width: 130,
-    height: 130,
+    maxWidth: 130,
     padding: 0,
-    border: '2px solid #ccc',
     borderRadius: 3,
     marginRight: theme.spacing(2),
   },
@@ -149,7 +147,14 @@ function StringEdit ({
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop: handleDrop
+    onDrop: handleDrop,
+    accept: 'image/jpeg, image/png, image/gif',
+    maxSize: '1000000',
+    multiple: fileLimit > 1 ? true : false,
+    preventDropOnDocument: true,
+    onDropRejected: () => {
+
+    },
   });
 
   return (
