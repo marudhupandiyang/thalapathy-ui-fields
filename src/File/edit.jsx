@@ -1,9 +1,9 @@
 import React from 'react';
 import uuid from 'uuid/v1';
 import clsx from 'clsx';
-import { useDropzone } from 'react-dropzone';
-import { makeStyles } from '@material-ui/styles';
+import { withStyles } from '@material-ui/styles';
 import PerfectScrollbar from 'react-perfect-scrollbar';
+import Dropzone from 'react-dropzone'
 
 import {
   Grid,
@@ -27,7 +27,7 @@ import MoreIcon from '@material-ui/icons/MoreVert';
 import DeleteIcon from '@material-ui/icons/Delete';
 import BackupIcon from '@material-ui/icons/Backup';
 
-const useStyles = makeStyles((theme) => ({
+const styles = (theme) => ({
   root: {},
   dropZone: {
     border: `1px dashed ${theme.palette.divider}`,
@@ -85,196 +85,272 @@ const useStyles = makeStyles((theme) => ({
       color: colors.grey[600],
     }
   }
-}));
+});
 
-function StringEdit ({
-  value,
-  displayName,
-  fieldName,
-  required,
-  helpText,
-  onChange
-}) {
-  const classes = useStyles();
-  const [files, setFiles] = React.useState([]);
-  const [altNames, setAltNames] = React.useState([]);
-  const fileAsDatURI = React.useRef();
-  const fileLimit = 1;
+const getExtension = (type) => {
+  switch (type) {
+    case "image/jpeg":
+      return 'jpeg';
 
-  const handleDrop = React.useCallback((acceptedFiles) => {
-    fileAsDatURI.current = fileAsDatURI.current || {};
-    const reader = new FileReader();
-    reader.addEventListener("load",  () => {
-      fileAsDatURI.current[acceptedFiles[0].name] = reader.result;
-      setFiles((prevFiles) => [...prevFiles].concat(acceptedFiles));
-      setAltNames([...altNames, '']);
-      onChangeProps();
-    }, false);
+    case "image/gif":
+      return 'gif';
 
-    reader.readAsDataURL(acceptedFiles[0]);
+    case "image/png":
+    default:
+      return 'png';
+  }
+};
 
-  }, []);
+class FileEdit extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      value: props.value || [],
+      tempValues: [],
+    };
 
-  const onChangeProps = () => {
-    const newData = [];
-    files.forEach((file, i) => {
-      const d = {
-        fileContent: fileAsDatURI[file.name],
-        name: file.name,
-        alt: altNames[i],
+    this.filesAsDataURI = {};
+    this.fileLimit = 1;
+  }
+
+  changePropValue = () => {
+    const files = [];
+    [...this.state.value, ...this.state.tempValues].forEach(file => {
+      const newFile = {
+        name: file.name || `${uuid()}.${getExtension(file.type)}`,
+        altName: file.altName,
+        dataUri: file.dataUri,
       };
-      newData.push(d);
+      files.push(newFile);
     });
-    onChange(newData);
+    this.props.onChange(this.fileLimit > 1 ? files : files[0]);
   };
 
-  const handleRemoveAll = () => {
-    setFiles([]);
-    onChangeProps();
+  handleRemove = (file) => {
+    if (!file) {
+      this.setState({
+        value: [],
+        tempValues: [],
+      });
+      return;
+    }
+
+    if (this.state.value.includes(file)) {
+      const newValue = [...this.state.value];
+      newValue.splice(this.state.value.indexOf(file), 1);
+      this.setState({
+        value: newValue,
+      });
+    } else if (this.state.tempValues.includes(file)) {
+      const newValue = [...this.state.tempValues];
+      newValue.splice(this.state.tempValues.indexOf(file), 1);
+      this.setState({
+        tempValues: newValue,
+      });
+    }
   };
 
-  const handleRemove = (i) => {
-    const newList = [...files];
-    newList.splice(i, 1);
-    setFiles(newList);
-    onChangeProps(newList);
+  handleDrop = (acceptedFiles) => {
+    const newTempValues = [];
+    const totalCount = acceptedFiles.length;
+
+    for (let i = 0; i < totalCount; i += 1) {
+      const currentFile = acceptedFiles[i];
+      const reader = new FileReader();
+      reader.addEventListener("load",  () => {
+        newTempValues.push({
+          dataUri: reader.result,
+          altName: currentFile.name,
+        });
+        if (newTempValues.length === totalCount) {
+          this.setState({
+            tempValues: [
+              ...this.state.tempValues,
+              ...newTempValues,
+            ],
+          }, () => {
+            this.changePropValue();
+          });
+        }
+      }, false);
+      reader.readAsDataURL(acceptedFiles[0]);
+    }
   };
 
-  const onAltChange = (i, val) => {
-    const newAltNames = [...altNames];
-    newAltNames[i] = val;
-    setAltNames(newAltNames);
+  onAltChange = (file, altStr) => {
+    if (this.state.value.includes(file)) {
+      const idx = this.state.value.indexOf(file);
+      const newValues = [...this.state.value];
+      newValues[idx].altName = altStr;
+      this.setState({
+        value: newValues,
+      }, () => {
+        this.changePropValue();
+      });
+    } else if (this.state.tempValues.includes(file)) {
+      const idx = this.state.tempValues.indexOf(file);
+      const newValues = [...this.state.tempValues];
+      newValues[idx].altName = altStr;
+      this.setState({
+        tempValues: newValues,
+      }, () => {
+        this.changePropValue();
+      });
+    }
   };
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop: handleDrop,
-    accept: 'image/jpeg, image/png, image/gif',
-    maxSize: '1000000',
-    multiple: fileLimit > 1 ? true : false,
-    preventDropOnDocument: true,
-    onDropRejected: () => {
+  render() {
+    const {
+      displayName,
+      fieldName,
+      required,
+      helpText,
+      onChange,
+      classes
+    } = this.props;
 
-    },
-  });
+    const {
+      value,
+      tempValues,
+    } = this.state;
 
-  return (
-    <Grid
-      key={fieldName}
-      container
-      spacing={6}
-    >
+    const usedLength = tempValues.length + value.length;
+    const hasReachedLimit = usedLength >=this.fileLimit;
+
+    return (
       <Grid
-        item
-        md={12}
+        key={fieldName}
+        container
+        spacing={6}
       >
-        <Card>
-          <CardHeader
-            title={displayName}
-            subheader={helpText}
-          />
-            <input {...getInputProps()} />
+        <Grid
+          item
+          md={12}
+        >
+          <Card>
+            <CardHeader
+              title={displayName}
+              subheader={helpText}
+            />
 
             {
-              !!(files.length < fileLimit) &&
-              <div
-                className={clsx({
-                  [classes.dropZone]: true,
-                  [classes.dragActive]: isDragActive
-                })}
-                {...getRootProps()}
+              !hasReachedLimit &&
+              <Dropzone
+                onDrop={this.handleDrop}
+                accept="image/jpeg, image/png, image/gif"
+                maxSize={1000000}
+                multiple={this.fileLimit > 1}
+                preventDropOnDocument
               >
-                <div>
-                  <BackupIcon className={classes.uploadIcon} />
-                </div>
-                <div>
-                <Typography
-                  gutterBottom
-                  variant="h3"
-                >
-                  Select files
-                </Typography>
-                <Typography
-                  className={classes.info}
-                  color="textSecondary"
-                  variant="body1"
-                >
-                  Drop files here or click
-                  {' '}
-                  <Link underline="always">browse</Link>
-                  {' '}
-                  thorough your machine
-                </Typography>
-              </div>
-            </div>
-          }
-          <CardActions>
-            {
-              files.length > 0 && (
-              <div>
-                <PerfectScrollbar options={{ suppressScrollX: true }}>
-                  <List className={classes.list}>
-                    {files.map((file, i) => (
-                      <ListItem
-                        className={classes.listItem}
-                        divider={i < files.length - 1}
-                        key={`${file.name}${i}`}
-                      >
-                        <ListItemIcon>
-                          <img className={classes.previewImage} src={fileAsDatURI.current[file.name]} />
-                        </ListItemIcon>
-                        <div>
-                          <div className={classes.listItemLeftContainerTop}>
-                            <ListItemText
-                              primary={file.name}
-                              primaryTypographyProps={{ variant: 'h5' }}
-                            />
-                            <Button
-                              className={classes.deleteIcon}
-                              onClick={() => handleRemove(i)}
-                              size="small"
-                            >
-                              <DeleteIcon />
-                            </Button>
-                          </div>
-                          <TextField
-                            fullWidth
-                            label="Alt Text"
-                            onChange={e => onAltChange(i, e.target.value)}
-                            type="text"
-                            value={altNames[i] || ""}
-                            variant="outlined"
-                          />
-                        </div>
-                      </ListItem>
-                    ))}
-                  </List>
-                </PerfectScrollbar>
-                <div className={classes.actions}>
-                  <Button
-                    onClick={handleRemoveAll}
-                    size="small"
+                {({ getRootProps, getInputProps, isDragActive}) => (
+                  <div
+                    className={clsx({
+                      [classes.dropZone]: true,
+                      [classes.dragActive]: isDragActive
+                    })}
+                    {...getRootProps()}
                   >
-                    Remove all
-                  </Button>
-                  {
-                    files.length < fileLimit &&
-                    <Button
-                      color="secondary"
-                      size="small"
-                      variant="contained"
+                    <input {...getInputProps()} />
+                    <div>
+                      <BackupIcon className={classes.uploadIcon} />
+                    </div>
+                    <div>
+                    <Typography
+                      gutterBottom
+                      variant="h3"
                     >
-                      Upload files
-                    </Button>
-                  }
+                      Select files
+                    </Typography>
+                    <Typography
+                      className={classes.info}
+                      color="textSecondary"
+                      variant="body1"
+                    >
+                      Drop files here or click
+                      {' '}
+                      <Link underline="always">browse</Link>
+                      {' '}
+                      thorough your machine
+                    </Typography>
+                  </div>
                 </div>
-              </div>
-              )
+                )}
+              </Dropzone>
             }
-          </CardActions>
-        </Card>
+
+            <CardActions>
+              {
+                usedLength > 0 && (
+                <div>
+                  <PerfectScrollbar options={{ suppressScrollX: true }}>
+                    <List className={classes.list}>
+                      {[...value, ...tempValues].map((file, i) => (
+                        <ListItem
+                          className={classes.listItem}
+                          divider={i < usedLength - 1}
+                          key={`${file.name}${i}`}
+                        >
+                          <ListItemIcon>
+                            <img
+                              className={classes.previewImage}
+                              src={file.imgPath || file.dataUri}
+                            />
+                          </ListItemIcon>
+                          <div>
+                            <div className={classes.listItemLeftContainerTop}>
+                              <ListItemText
+                                primary={file.name}
+                                primaryTypographyProps={{ variant: 'h5' }}
+                              />
+                              <Button
+                                className={classes.deleteIcon}
+                                onClick={() => this.handleRemove(file)}
+                                size="small"
+                              >
+                                <DeleteIcon />
+                              </Button>
+                            </div>
+                            <TextField
+                              fullWidth
+                              label="Alt Text"
+                              onChange={e => this.onAltChange(file, e.target.value)}
+                              type="text"
+                              value={file.altName || ""}
+                              variant="outlined"
+                            />
+                          </div>
+                        </ListItem>
+                      ))}
+                    </List>
+                  </PerfectScrollbar>
+                  <div className={classes.actions}>
+                    <Button
+                      onClick={this.handleRemove}
+                      size="small"
+                    >
+                      Remove all
+                    </Button>
+                    {
+                      !hasReachedLimit &&
+                      <Button
+                        color="secondary"
+                        size="small"
+                        variant="contained"
+                      >
+                        Upload files
+                      </Button>
+                    }
+                  </div>
+                </div>
+                )
+              }
+            </CardActions>
+          </Card>
+        </Grid>
       </Grid>
-    </Grid>
-  );
+    );
+
+  }
 }
 
-export default StringEdit;
+export default withStyles(styles)(FileEdit);
