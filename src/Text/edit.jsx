@@ -5,19 +5,14 @@ import {
   TextField,
 } from '@material-ui/core';
 
-function JSONEdit ({
-  value = '',
+function StringEdit ({
+  value,
   displayName,
   fieldName,
   required,
   helpText,
   onChange
 }) {
-  let newValue = value || '';
-  if (!(typeof newValue === 'string' || newValue instanceof String)) {
-    newValue = JSON.stringify(newValue);
-  }
-
   return (
     <Grid
       key={fieldName}
@@ -31,14 +26,14 @@ function JSONEdit ({
         <TextField
           fullWidth
           multiline
+          rows="4"
           required={required}
           label={displayName}
           helperText={helpText}
           name={fieldName}
           onChange={(e) => onChange(e.target.value)}
           type="text"
-          rows="4"
-          value={newValue}
+          value={value || ''}
           variant="outlined"
         />
       </Grid>
@@ -46,4 +41,4 @@ function JSONEdit ({
   );
 }
 
-export default JSONEdit;
+export default StringEdit;
