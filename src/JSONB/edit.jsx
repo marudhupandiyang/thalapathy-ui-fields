@@ -5,45 +5,68 @@ import {
   TextField,
 } from '@material-ui/core';
 
-function JSONEdit ({
-  value = '',
-  displayName,
-  fieldName,
-  required,
-  helpText,
-  onChange
-}) {
-  let newValue = value || '';
-  if (!(typeof newValue === 'string' || newValue instanceof String)) {
-    newValue = JSON.stringify(newValue);
+class JSONEdit extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      value: JSON.stringify(props.value || ''),
+    };
   }
 
-  return (
-    <Grid
-      key={fieldName}
-      container
-      spacing={6}
-    >
+  onChange = (value) => {
+    this.setState({
+      value,
+    }, () => {
+      let value = ''
+      try {
+        value = JSON.parse(this.state.value);
+      } catch (ex) {}
+      this.props.onChange(value);
+    });
+  }
+
+  render () {
+    const {
+      error,
+      displayName,
+      fieldName,
+      required,
+      helpText,
+      onChange,
+    } = this.props;
+
+    const {
+      value,
+    } = this.state;
+
+    return (
       <Grid
-        item
-        md={12}
+        key={fieldName}
+        container
+        spacing={6}
       >
-        <TextField
-          fullWidth
-          multiline
-          required={required}
-          label={displayName}
-          helperText={helpText}
-          name={fieldName}
-          onChange={(e) => onChange(e.target.value)}
-          type="text"
-          rows="4"
-          value={newValue}
-          variant="outlined"
-        />
+        <Grid
+          item
+          md={12}
+        >
+          <TextField
+            rows="4"
+            fullWidth
+            multiline
+            type="text"
+            value={value}
+            error={error}
+            name={fieldName}
+            variant="outlined"
+            required={required}
+            label={displayName}
+            helperText={helpText}
+            onChange={(e) => this.onChange(e.target.value)}
+          />
+        </Grid>
       </Grid>
-    </Grid>
-  );
+    );
+  }
 }
 
 export default JSONEdit;

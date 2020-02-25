@@ -7,6 +7,7 @@ import {
 
 function StringEdit ({
   value,
+  error,
   displayName,
   fieldName,
   required,
@@ -24,6 +25,7 @@ function StringEdit ({
         md={12}
       >
         <TextField
+          error={error}
           fullWidth
           required={required}
           label={displayName}

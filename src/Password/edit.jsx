@@ -7,6 +7,7 @@ import {
 
 function PasswordEdit ({
   value,
+  error,
   displayName,
   fieldName,
   required,
@@ -24,6 +25,7 @@ function PasswordEdit ({
         md={12}
       >
         <TextField
+          error={error}
           fullWidth
           required={required}
           label={displayName}

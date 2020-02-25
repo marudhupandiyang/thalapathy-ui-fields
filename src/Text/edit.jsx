@@ -7,6 +7,7 @@ import {
 
 function StringEdit ({
   value,
+  error,
   displayName,
   fieldName,
   required,
@@ -27,6 +28,7 @@ function StringEdit ({
           fullWidth
           multiline
           rows="4"
+          error={error}
           required={required}
           label={displayName}
           helperText={helpText}

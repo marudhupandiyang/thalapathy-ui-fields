@@ -84,7 +84,10 @@ const styles = (theme) => ({
     'svg&:hover': {
       color: colors.grey[600],
     }
-  }
+  },
+  error: {
+    color: colors.red[600],
+  },
 });
 
 const getExtension = (type) => {
@@ -105,12 +108,17 @@ class FileEdit extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      value: props.value || [],
       tempValues: [],
     };
 
     this.filesAsDataURI = {};
     this.fileLimit = 1;
+
+    if (this.fileLimit === 1) {
+      this.state.value = props.value ? [props.value] : [];
+    } else {
+      this.state.value = [];
+    }
   }
 
   changePropValue = () => {
@@ -131,6 +139,8 @@ class FileEdit extends React.Component {
       this.setState({
         value: [],
         tempValues: [],
+      }, () => {
+        this.changePropValue();
       });
       return;
     }
@@ -140,12 +150,16 @@ class FileEdit extends React.Component {
       newValue.splice(this.state.value.indexOf(file), 1);
       this.setState({
         value: newValue,
+      }, () => {
+        this.changePropValue();
       });
     } else if (this.state.tempValues.includes(file)) {
       const newValue = [...this.state.tempValues];
       newValue.splice(this.state.tempValues.indexOf(file), 1);
       this.setState({
         tempValues: newValue,
+      }, () => {
+        this.changePropValue();
       });
     }
   };
@@ -159,6 +173,7 @@ class FileEdit extends React.Component {
       const reader = new FileReader();
       reader.addEventListener("load",  () => {
         newTempValues.push({
+          name: currentFile.name,
           dataUri: reader.result,
           altName: currentFile.name,
         });
@@ -201,6 +216,7 @@ class FileEdit extends React.Component {
 
   render() {
     const {
+      error,
       displayName,
       fieldName,
       required,
@@ -229,6 +245,7 @@ class FileEdit extends React.Component {
         >
           <Card>
             <CardHeader
+              classes={{ subheader: error && classes.error }}
               title={displayName}
               subheader={helpText}
             />

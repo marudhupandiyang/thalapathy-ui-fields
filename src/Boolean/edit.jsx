@@ -8,6 +8,7 @@ import {
 
 function BooleanEdit ({
   value,
+  error,
   displayName,
   fieldName,
   required,
@@ -25,7 +26,7 @@ function BooleanEdit ({
         md={12}
       >
         <Typography variant="h6">{displayName}</Typography>
-        { helpText && <Typography variant="body2">{helpText}</Typography>}
+        { helpText && <Typography color={error ? 'error' : ''} variant="body2">{helpText}</Typography>}
         <Switch
           checked={value}
           color="secondary"
