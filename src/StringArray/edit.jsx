@@ -5,14 +5,25 @@ import {
   colors,
   Grid,
   Card,
+  Paper,
   Button,
-  CardActions,
-  CardHeader,
   TextField,
   Typography,
 } from '@material-ui/core';
 
 const styles = (theme) => ({
+  root: {
+    padding: theme.spacing(2),
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
+  },
+  valuesContainer: {
+    padding: theme.spacing(2),
+    paddingBottom: 0,
+  },
+  valueField: {
+    paddingBottom: theme.spacing(2),
+  },
   error: {
     color: colors.red[600],
   },
@@ -43,10 +54,12 @@ class StringArray extends React.Component {
     });
   }
 
-  getField = (v, i, required) => (
+  getField = (v, i) => (
     <TextField
+      key={i}
       fullWidth
-      required={required}
+      className={this.props.classes.valueField}
+      required={this.props.required}
       onChange={(e) => this.onChange(e.target.value, i)}
       type="text"
       value={v || ''}
@@ -61,7 +74,8 @@ class StringArray extends React.Component {
       fieldName,
       required,
       helpText,
-      onChange
+      onChange,
+      classes
     } = this.props;
 
     const {
@@ -69,41 +83,27 @@ class StringArray extends React.Component {
     } = this.state;
 
     return (
-      <Grid
-        key={fieldName}
-        container
-        spacing={6}
-      >
-        <Grid
-          item
-          md={12}
-        >
-          <Card>
-            <CardHeader
-              classes={{ subheader: error && classes.error }}
-              title={displayName}
-              subheader={helpText}
-            />
-            {
-              value.map((v, i) => this.getField(v,i, required))
-            }
-            <CardActions>
-               <Button
-                  color="secondary"
-                  size="small"
-                  variant="contained"
-                  onClick={() => {
-                    this.setState({
-                      value: [...value, ''],
-                    });
-                  }}
-                >
-                  Add another ${displayName}
-                </Button>
-            </CardActions>
-          </Card>
-        </Grid>
-      </Grid>
+      <Paper variant="outlined" square className={classes.root}>
+        <Typography variant={'h6'}>{displayName}</Typography>
+        {helpText && <Typography fontWeight="light" className={error && classes.error} variant={'p'}>{helpText}</Typography>}
+        <div className={classes.valuesContainer}>
+          {
+            value.map((v, i) => this.getField(v,i))
+          }
+        </div>
+         <Button
+            color="secondary"
+            size="small"
+            variant="contained"
+            onClick={() => {
+              this.setState({
+                value: [...value, ''],
+              });
+            }}
+          >
+            Add another {displayName}
+          </Button>
+      </Paper>
     );
   }
 }
