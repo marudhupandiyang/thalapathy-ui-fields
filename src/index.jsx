@@ -1,4 +1,5 @@
 const StringView = require('./String');
+const StringArrayView = require('./StringArray');
 const TextView = require('./Text');
 const DateTimeView = require('./DateTime');
 const IntegerView = require('./Integer');
@@ -11,6 +12,7 @@ const FileView = require('./File');
 
 module.exports = {
   String: StringView,
+  StringArray: StringArrayView,
   Text: TextView,
   DateTime: DateTimeView,
   Integer: IntegerView,
