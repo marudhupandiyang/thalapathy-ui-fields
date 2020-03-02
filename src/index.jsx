@@ -10,6 +10,8 @@ const AutoIncrementView = require('./AutoIncrement');
 const PasswordView = require('./Password');
 const FileView = require('./File');
 
+const AsociationhasManyView = require('./AsociationhasMany');
+
 module.exports = {
   String: StringView,
   StringArray: StringArrayView,
@@ -22,4 +24,5 @@ module.exports = {
   AutoIncrement: AutoIncrementView,
   Password: PasswordView,
   File: FileView,
+  AsociationhasMany: AsociationhasManyView,
 };

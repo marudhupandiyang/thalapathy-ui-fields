@@ -6,10 +6,8 @@ module.exports = {
   edit: path.resolve(__dirname, './edit.jsx'),
   validate: ({ value, required }) => {
     try {
-      if (value.constructor.name === 'Object') {
-        return true;
-      }
-      throw 'Invalid JSON value';
+      JSON.stringify(value);
+      return true;
     } catch (ex) {
       return ex.message || ex;
     }
