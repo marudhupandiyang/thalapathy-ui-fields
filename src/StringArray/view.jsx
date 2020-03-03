@@ -1,11 +1,11 @@
 import React from 'react';
 
-function ArrayPreivew ({ data }) {
+function StringArrayPreivew ({ data }) {
   return (
-    <ul>
+    <ul style={{ listStylePosition: 'inside' }}>
       {(data || []).map((l, i) => (<li key={i}>{l}</li>))}
     </ul>
   );
 }
 
-export default ArrayPreivew;
+export default StringArrayPreivew;

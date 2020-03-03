@@ -9,8 +9,12 @@ class JSONEdit extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      value: JSON.stringify(props.value || ''),
+      value: '',
     };
+
+    try {
+      this.state.value = props.value ? JSON.stringify(props.value) : '';
+    } catch (ex) {}
   }
 
   onChange = (value) => {
@@ -69,4 +73,7 @@ class JSONEdit extends React.Component {
   }
 }
 
+JSONEdit.defaultProps = {
+  helpText: 'Use only doublequotes(") to surround key and values',
+};
 export default JSONEdit;
