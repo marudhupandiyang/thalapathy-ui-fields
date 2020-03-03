@@ -16,7 +16,7 @@ function FilePreview ({ data }) {
     return (
       <img
         className={classes.img}
-        src={`${data.path}/${data.name}`}
+        src={data.thumbPath}
         alt={data.altName || data.name}
       />
     );

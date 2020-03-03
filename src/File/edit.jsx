@@ -310,7 +310,7 @@ class FileEdit extends React.Component {
                           <ListItemIcon>
                             <img
                               className={classes.previewImage}
-                              src={file.imgPath || file.dataUri}
+                              src={file.thumbPath || file.dataUri}
                             />
                           </ListItemIcon>
                           <div>
