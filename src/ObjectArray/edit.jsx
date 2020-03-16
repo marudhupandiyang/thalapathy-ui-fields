@@ -39,73 +39,51 @@ const styles = (theme) => ({
   },
 });
 
-class ObjectArray extends React.Component {
+class ObjectArray extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      keys: [],
-      values: []
+      value: props.value || [],
     };
 
-    if (props.value) {
-      Object.keys(props.value).forEach(key => {
-        this.state.keys.push(key);
-        this.state.values.push(props.value[key]);
-      })
-    } else {
-      this.state.keys = [''];
-      this.state.values = [''];
+    if (!this.state.value.length) {
+      this.state.value.push({});
     }
   }
 
-  propsChange = () => {
-    const newObj = {};
-    this.state.keys.forEach((k, i) => {
-      newObj[k] = this.state.values[i];
-    });
-    this.props.onChange(newObj);
-  }
+  onChange = (value, i) => {
+    const newValue = [...this.state.value];
 
-  onChange = (key, value, i) => {
-    const newValues = [...this.state.values];
-    const newKeys = [...this.state.keys];
-
-    if (i < newValues.length) {
-      newValues[i] = value;
-      newKeys[i] = key;
+    if (i < newValue.length) {
+      newValue[i] = value;
     } else {
-      newValues.push(value);
-      newKeys.push(key);
+      newValue.push(value);
     }
 
     this.setState({
-      keys: newKeys,
-      values: newValues,
-    }, this.propsChange);
+      value: newValue,
+    }, () => this.props.onChange(this.state.value));
   };
 
   onRemove = (i) => {
-    const newValues = [...this.state.values];
-    const newKeys = [...this.state.keys];
+    const newValue = [...this.state.value];
 
-    newValues.splice(i, 1);
-    newKeys.splice(i, 1);
+    newValue.splice(i, 1);
 
     this.setState({
-      keys: newKeys,
-      values: newValues,
-    }, this.propsChange);
+      value: newValue,
+    }, () => this.props.onChange(this.state.value));
   }
 
-  getField = (key, value, i) => (
+  getField = (value, i) => (
      <Box display="flex" flexDirection="row" key={i}>
       <TextField
         fullWidth
         className={this.props.classes.valueField}
         required={this.props.required}
-        onChange={(e) => this.onChange(e.target.value, value, i)}
+        onChange={(e) => this.onChange({ ...value, key: e.target.value }, i)}
         type="text"
-        value={key || ''}
+        value={value.key || ''}
         variant="outlined"
       />
 
@@ -113,9 +91,9 @@ class ObjectArray extends React.Component {
         fullWidth
         className={this.props.classes.valueRightField}
         required={this.props.required}
-        onChange={(e) => this.onChange(key, e.target.value, i)}
+        onChange={(e) => this.onChange({ ...value, value: e.target.value }, i)}
         type="text"
-        value={value || ''}
+        value={value.value || ''}
         variant="outlined"
       />
       <IconButton className={this.props.classes.deleteButton} aria-label="delete" onClick={(e) => this.onRemove(i)}>
@@ -136,8 +114,7 @@ class ObjectArray extends React.Component {
     } = this.props;
 
     const {
-      keys,
-      values,
+      value,
     } = this.state;
 
     return (
@@ -146,7 +123,7 @@ class ObjectArray extends React.Component {
         {helpText && <Typography fontWeight="light" className={error && classes.error} variant={'p'}>{helpText}</Typography>}
         <div className={classes.valuesContainer}>
           {
-            keys.map((key, i) => this.getField(key, values[i], i))
+            value.map((val, i) => this.getField(val, i))
           }
         </div>
          <Button
@@ -154,7 +131,7 @@ class ObjectArray extends React.Component {
             size="small"
             variant="contained"
             onClick={() => {
-              this.onChange('', '', keys.length);
+              this.onChange({}, value.length);
             }}
           >
             Add another {displayName}

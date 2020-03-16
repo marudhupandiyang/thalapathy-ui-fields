@@ -75,9 +75,8 @@ class StringArray extends React.Component {
   }
 
   getField = (v, i) => (
-     <Box display="flex" flexDirection="row">
+     <Box display="flex" flexDirection="row" key={i}>
       <TextField
-        key={i}
         fullWidth
         className={this.props.classes.valueField}
         required={this.props.required}

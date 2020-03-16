@@ -3,7 +3,7 @@ import React from 'react';
 function ObjectArrayPreivew ({ data }) {
   return (
     <ul style={{ listStylePosition: 'inside' }}>
-      {Object.keys(data || {}).map((l, i) => (<li key={i}><b>{l}</b>: {data[l]}</li>))}
+      {(data || []).map((l, i) => (<li key={i}><b>{l.key}</b>: {l.value}</li>))}
     </ul>
   );
 }
