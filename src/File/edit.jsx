@@ -254,8 +254,12 @@ class FileEdit extends React.Component {
               !hasReachedLimit &&
               <Dropzone
                 onDrop={this.handleDrop}
+                onDropRejected={files => {
+                  const errMsg = 'Can\t select file. File should be an image and should be within 2MB';
+                  window.showNotification && window.showNotification(errMsg);
+                }}
                 accept="image/jpeg, image/png, image/gif"
-                maxSize={1000000}
+                maxSize={2097152}
                 multiple={this.fileLimit > 1}
                 preventDropOnDocument
               >
@@ -310,7 +314,7 @@ class FileEdit extends React.Component {
                           <ListItemIcon>
                             <img
                               className={classes.previewImage}
-                              src={file.thumbPath || file.dataUri}
+                              src={file.thumbnailUrl || file.dataUri}
                             />
                           </ListItemIcon>
                           <div>
