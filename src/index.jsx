@@ -1,5 +1,6 @@
 const StringView = require('./String');
 const StringArrayView = require('./StringArray');
+const ObjectArrayView = require('./ObjectArray');
 const TextView = require('./Text');
 const DateTimeView = require('./DateTime');
 const IntegerView = require('./Integer');
@@ -15,6 +16,7 @@ const AsociationhasManyView = require('./AsociationhasMany');
 module.exports = {
   String: StringView,
   StringArray: StringArrayView,
+  ObjectArray: ObjectArrayView,
   Text: TextView,
   DateTime: DateTimeView,
   Integer: IntegerView,

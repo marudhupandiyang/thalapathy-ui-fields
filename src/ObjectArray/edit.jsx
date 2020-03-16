@@ -28,62 +28,94 @@ const styles = (theme) => ({
   valueField: {
     paddingBottom: theme.spacing(2),
   },
-  error: {
-    color: colors.red[600],
+  valueRightField: {
+    paddingLeft: theme.spacing(2),
   },
   deleteButton: {
     paddingLeft: theme.spacing(2),
   },
+  error: {
+    color: colors.red[600],
+  },
 });
 
-class StringArray extends React.Component {
+class ObjectArray extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      value: props.value || [''],
+      keys: [],
+      values: []
     };
 
-    if (!this.state.value.length) {
-      this.state.value = [''];
+    if (props.value) {
+      Object.keys(props.value).forEach(key => {
+        this.state.keys.push(key);
+        this.state.values.push(props.value[key]);
+      })
+    } else {
+      this.state.keys = [''];
+      this.state.values = [''];
     }
   }
 
-  onChange = (v, i) => {
-    const newValue = [
-      ...this.state.value,
-    ];
-    newValue[i] = v;
+  propsChange = () => {
+    const newObj = {};
+    this.state.keys.forEach((k, i) => {
+      newObj[k] = this.state.values[i];
+    });
+    this.props.onChange(newObj);
+  }
+
+  onChange = (key, value, i) => {
+    const newValues = [...this.state.values];
+    const newKeys = [...this.state.keys];
+
+    if (i < newValues.length) {
+      newValues[i] = value;
+      newKeys[i] = key;
+    } else {
+      newValues.push(value);
+      newKeys.push(key);
+    }
 
     this.setState({
-      value: newValue,
-    }, () => {
-      this.props.onChange(this.state.value);
-    });
+      keys: newKeys,
+      values: newValues,
+    }, this.propsChange);
   };
 
   onRemove = (i) => {
-    const newValue = [
-      ...this.state.value,
-    ];
+    const newValues = [...this.state.values];
+    const newKeys = [...this.state.keys];
 
-    newValue.splice(i, 1);
+    newValues.splice(i, 1);
+    newKeys.splice(i, 1);
+
     this.setState({
-      value: newValue,
-    }, () => {
-      this.props.onChange(this.state.value);
-    });
+      keys: newKeys,
+      values: newValues,
+    }, this.propsChange);
   }
 
-  getField = (v, i) => (
-     <Box display="flex" flexDirection="row">
+  getField = (key, value, i) => (
+     <Box display="flex" flexDirection="row" key={i}>
       <TextField
-        key={i}
         fullWidth
         className={this.props.classes.valueField}
         required={this.props.required}
-        onChange={(e) => this.onChange(e.target.value, i)}
+        onChange={(e) => this.onChange(e.target.value, value, i)}
         type="text"
-        value={v || ''}
+        value={key || ''}
+        variant="outlined"
+      />
+
+      <TextField
+        fullWidth
+        className={this.props.classes.valueRightField}
+        required={this.props.required}
+        onChange={(e) => this.onChange(key, e.target.value, i)}
+        type="text"
+        value={value || ''}
         variant="outlined"
       />
       <IconButton className={this.props.classes.deleteButton} aria-label="delete" onClick={(e) => this.onRemove(i)}>
@@ -104,7 +136,8 @@ class StringArray extends React.Component {
     } = this.props;
 
     const {
-      value,
+      keys,
+      values,
     } = this.state;
 
     return (
@@ -113,7 +146,7 @@ class StringArray extends React.Component {
         {helpText && <Typography fontWeight="light" className={error && classes.error} variant={'p'}>{helpText}</Typography>}
         <div className={classes.valuesContainer}>
           {
-            value.map((v, i) => this.getField(v,i))
+            keys.map((key, i) => this.getField(key, values[i], i))
           }
         </div>
          <Button
@@ -121,9 +154,7 @@ class StringArray extends React.Component {
             size="small"
             variant="contained"
             onClick={() => {
-              this.setState({
-                value: [...value, ''],
-              });
+              this.onChange('', '', keys.length);
             }}
           >
             Add another {displayName}
@@ -133,4 +164,4 @@ class StringArray extends React.Component {
   }
 }
 
-export default withStyles(styles)(StringArray);
+export default withStyles(styles)(ObjectArray);
