@@ -1,5 +1,5 @@
 import React from 'react';
-import uuid from 'uuid/v1';
+import { v4 as uuidv4 } from 'uuid';
 import clsx from 'clsx';
 import { withStyles } from '@material-ui/styles';
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -125,7 +125,7 @@ class FileEdit extends React.Component {
     const files = [];
     [...this.state.value, ...this.state.tempValues].forEach(file => {
       const newFile = {
-        name: file.name || `${uuid()}.${getExtension(file.type)}`,
+        name: file.name || `${uuidv4()}.${getExtension(file.type)}`,
         altName: file.altName,
         dataUri: file.dataUri,
       };
