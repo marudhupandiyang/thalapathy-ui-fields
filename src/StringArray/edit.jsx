@@ -12,6 +12,7 @@ import {
   Container,
   IconButton,
   Box,
+  MenuItem,
 } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 
@@ -78,13 +79,22 @@ class StringArray extends React.Component {
      <Box display="flex" flexDirection="row" key={i}>
       <TextField
         fullWidth
+        select={!!this.props.options}
         className={this.props.classes.valueField}
         required={this.props.required}
         onChange={(e) => this.onChange(e.target.value, i)}
         type="text"
         value={v || ''}
         variant="outlined"
-      />
+      >
+        {
+          this.props.options && this.props.options.map(val => (
+            <MenuItem key={val} value={val}>
+              {val}
+            </MenuItem>
+          ))
+        }
+      </TextField>
       <IconButton className={this.props.classes.deleteButton} aria-label="delete" onClick={(e) => this.onRemove(i)}>
         <DeleteIcon />
       </IconButton>

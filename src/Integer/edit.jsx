@@ -3,6 +3,7 @@ import React from 'react';
 import {
   Grid,
   TextField,
+  MenuItem,
 } from '@material-ui/core';
 
 function IntegerEdit ({
@@ -12,7 +13,8 @@ function IntegerEdit ({
   fieldName,
   required,
   helpText,
-  onChange
+  onChange,
+  options,
 }) {
   return (
     <Grid
@@ -27,6 +29,7 @@ function IntegerEdit ({
         <TextField
           error={error}
           fullWidth
+          select={!!options}
           required={required}
           label={displayName}
           helperText={helpText}
@@ -35,7 +38,15 @@ function IntegerEdit ({
           type="number"
           value={value || ''}
           variant="outlined"
-        />
+        >
+          {
+            options && options.map(val => (
+              <MenuItem key={val} value={val}>
+                {val}
+              </MenuItem>
+            ))
+          }
+        </TextField>
       </Grid>
     </Grid>
   );
