@@ -231,7 +231,7 @@ class FileEdit extends React.Component {
     } = this.state;
 
     const usedLength = tempValues.length + value.length;
-    const hasReachedLimit = usedLength >=this.fileLimit;
+    const hasReachedLimit = usedLength >= this.fileLimit;
 
     return (
       <Grid
@@ -349,7 +349,7 @@ class FileEdit extends React.Component {
                       onClick={this.handleRemove}
                       size="small"
                     >
-                      Remove all
+                      {usedLength > 1 ? 'Remove all' : 'Remove'}
                     </Button>
                     {
                       !hasReachedLimit &&
