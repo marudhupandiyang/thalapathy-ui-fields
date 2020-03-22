@@ -12,6 +12,7 @@ const PasswordView = require('./Password');
 const FileView = require('./File');
 
 const AsociationhasManyView = require('./AsociationhasMany');
+const AsociationbelongsToView = require('./AsociationbelongsTo');
 
 module.exports = {
   String: StringView,
@@ -27,4 +28,5 @@ module.exports = {
   Password: PasswordView,
   File: FileView,
   AsociationhasMany: AsociationhasManyView,
+  AsociationbelongsTo: AsociationbelongsToView,
 };
