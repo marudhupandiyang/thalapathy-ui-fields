@@ -24,6 +24,7 @@ module.exports = {
   Decimal: DecimalView,
   Boolean: BooleanView,
   JSONB: JSONBView,
+  Object: JSONBView,
   AutoIncrement: AutoIncrementView,
   Password: PasswordView,
   File: FileView,
