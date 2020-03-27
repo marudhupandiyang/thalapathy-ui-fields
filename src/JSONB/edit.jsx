@@ -24,7 +24,9 @@ class JSONEdit extends React.Component {
       let value = ''
       try {
         value = JSON.parse(this.state.value);
-      } catch (ex) {}
+      } catch (ex) {
+        value = this.state.value;
+      }
       this.props.onChange(value);
     });
   }
