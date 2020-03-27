@@ -10,15 +10,21 @@ module.exports = {
     }
 
     if (value) {
-      try {
-        const newVal = JSON.parse(value);
-        if (required && Object.keys(newVal).length === 0) {
-          return false;
-        }
-
+      if (typeof value === 'object') {
         return true;
-      } catch (ex) {
-        return ex.message;
+      } else if (typeof value === 'string') {
+        try {
+          const newVal = JSON.parse(value);
+          if (required && Object.keys(newVal).length === 0) {
+            return false;
+          }
+
+          return true;
+        } catch (ex) {
+          return ex.message;
+        }
+      } else {
+        return 'Unknown value';
       }
     }
   },
