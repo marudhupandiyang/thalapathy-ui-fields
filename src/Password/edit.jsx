@@ -63,7 +63,7 @@ function PasswordEdit ({
           label={displayName}
           helperText={`${helpText || ''}`}
           name={fieldName}
-          onChange={isEditing && ((e) => onChange(e.target.value))}
+          onChange={isEditing && ((e) => onChange({ newValue: e.target.value }))}
           type="password"
           value={value || ''}
           variant="outlined"
@@ -75,22 +75,19 @@ function PasswordEdit ({
         spacing={0}
         alignItems="center"
       >
-      {
-        !passwordModified &&
-          <Button
-            className={classes.deleteIcon}
-            onClick={() => {
-              setIsEditing(!isEditing);
-              if (!isEditing) {
-                inputEl.current.focus();
-              }
-            }}
-            size="small"
-            title={isEditing ? 'Clear' : 'Edit'}
-          >
-            {isEditing ? <ClearIcon /> : <EditIcon />}
-          </Button>
-      }
+        <Button
+          className={classes.deleteIcon}
+          onClick={() => {
+            if (!isEditing) {
+              inputEl.current.focus();
+            }
+            setIsEditing(!isEditing);
+          }}
+          size="small"
+          title={isEditing ? 'Clear' : 'Edit'}
+        >
+          {isEditing ? <ClearIcon /> : <EditIcon />}
+        </Button>
       {
         passwordModified &&
         <Button
