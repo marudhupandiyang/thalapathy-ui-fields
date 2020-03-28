@@ -34,14 +34,27 @@ function PasswordEdit ({
   onChange,
   classes,
 }) {
-  const inputEl = React.useRef();
   const originalPassword = React.useRef();
+  const currentPassword = React.useRef();
   const [isEditing, setIsEditing] = React.useState(false);
 
   if (!originalPassword.current) {
     originalPassword.current = { value };
   }
+
+  if (!currentPassword.current) {
+    currentPassword.current = '';
+  }
+
   const passwordModified = value !== originalPassword.current.value;
+  let passwordSet = value ? 'Password is Set' : 'Password is Not Set';
+  let newPassword = '';
+  if (passwordModified) {
+    try {
+      newPassword = JSON.parse(value).newValue;
+      passwordSet = newPassword ? 'New password set' : 'New Password is empty';
+    } catch (ex) {}
+  }
 
   return (
     <Grid
@@ -54,20 +67,43 @@ function PasswordEdit ({
         md={10}
         container
       >
-        <TextField
-          error={error}
-          fullWidth
-          ref={inputEl}
-          disabled={!isEditing}
-          required={required}
-          label={displayName}
-          helperText={`${helpText || ''}`}
-          name={fieldName}
-          onChange={isEditing && ((e) => onChange({ newValue: e.target.value }))}
-          type="password"
-          value={value || ''}
-          variant="outlined"
-        />
+        {
+          !isEditing &&
+          <TextField
+            type="text"
+            fullWidth
+            disabled
+            error={error}
+            name={fieldName}
+            variant="outlined"
+            required={required}
+            label={displayName}
+            key="password-view"
+            value={passwordSet}
+            helperText={helpText}
+          />
+        }
+        {
+          isEditing &&
+          <TextField
+            fullWidth
+            autoFocus
+            error={error}
+            type="password"
+            autoComplete="off"
+            name={fieldName}
+            variant="outlined"
+            label={displayName}
+            required={required}
+            key="password-edit"
+            value={currentPassword.current}
+            onChange={(e) => {
+              currentPassword.current = e.target.value;
+              onChange(JSON.stringify({ newValue: e.target.value }));
+            }}
+            helperText="Enter a new password. Setting no password will make you unable to login."
+          />
+        }
       </Grid>
       <Grid
         md={2}
@@ -76,14 +112,12 @@ function PasswordEdit ({
         alignItems="center"
       >
         <Button
+          size="small"
           className={classes.deleteIcon}
           onClick={() => {
-            if (!isEditing) {
-              inputEl.current.focus();
-            }
+            currentPassword.current = '';
             setIsEditing(!isEditing);
           }}
-          size="small"
           title={isEditing ? 'Clear' : 'Edit'}
         >
           {isEditing ? <ClearIcon /> : <EditIcon />}
