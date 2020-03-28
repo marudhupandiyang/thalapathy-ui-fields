@@ -9,7 +9,7 @@ const BooleanView = require('./Boolean');
 const JSONBView = require('./JSONB');
 const AutoIncrementView = require('./AutoIncrement');
 const PasswordView = require('./Password');
-const FileView = require('./File');
+const ImageView = require('./Image');
 
 const AsociationhasManyView = require('./AsociationhasMany');
 const AsociationbelongsToView = require('./AsociationbelongsTo');
@@ -27,7 +27,7 @@ module.exports = {
   Object: JSONBView,
   AutoIncrement: AutoIncrementView,
   Password: PasswordView,
-  File: FileView,
+  Image: ImageView,
   AsociationhasMany: AsociationhasManyView,
   AsociationbelongsTo: AsociationbelongsToView,
 };

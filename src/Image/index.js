@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-  name: 'File',
+  name: 'Image',
   preview: path.resolve(__dirname, './view.jsx'),
   edit: path.resolve(__dirname, './edit.jsx'),
   validate: ({ value, required }) => {
@@ -9,7 +9,7 @@ module.exports = {
       if (value.constructor.name === 'Object') {
         return true;
       }
-      throw 'Invalid file';
+      throw 'Invalid image';
     } catch (ex) {
       return ex.message || ex;
     }

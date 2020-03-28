@@ -10,13 +10,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function FilePreview ({ data }) {
+function ImagePreview ({ data, list }) {
   const classes = useStyles();
   if (data && data.name) {
+    const lowest = Math.min(...Object.values(data));
+    const idx = Object.values(data).indexOf(lowest);
     return (
       <img
         className={classes.img}
-        src={data.thumbnailUrl}
+        src={`${data.path}/${data.img[Object.keys(data)[idx]]}`}
         alt={data.altName || data.name}
       />
     );
@@ -25,4 +27,4 @@ function FilePreview ({ data }) {
   return 'Not Selected Yet';
 }
 
-export default FilePreview;
+export default ImagePreview;
