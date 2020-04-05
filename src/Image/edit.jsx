@@ -232,7 +232,7 @@ class FileEdit extends React.Component {
 
     const usedLength = tempValues.length + value.length;
     const hasReachedLimit = usedLength >= this.fileLimit;
-
+    debugger;
     return (
       <Grid
         key={fieldName}

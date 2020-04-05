@@ -13,12 +13,21 @@ const useStyles = makeStyles((theme) => ({
 function ImagePreview ({ data, list }) {
   const classes = useStyles();
   if (data && data.name) {
-    const lowest = Math.min(...Object.values(list.sizes));
-    let idx = Object.values(data).indexOf(lowest);
-    let name = data[Object.values(data)[idx]];
-    if (!name) {
+
+    let name = 'name';
+
+    try {
+      if (list.sizes) {
+        const lowest = Math.min(...Object.values(list.sizes));
+        let idx = Object.values(data).indexOf(lowest);
+        if (idx >= 0) {
+          name = data[Object.values(data)[idx]];
+        }
+      }
+    } catch (ex) {
       name = 'name';
     }
+
     return (
       <img
         className={classes.img}
