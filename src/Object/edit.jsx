@@ -78,11 +78,12 @@ class ObjectEdit extends React.Component {
           <Editor
             mode="code"
             ace={ace}
-            theme="ace/theme/github"
+            theme="ace/theme/monokai"
             value={value}
             onChange={this.onChange}
             navigationBar={false}
             search={false}
+            statusBar={false}
           />
           {
             error &&
