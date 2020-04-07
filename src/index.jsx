@@ -7,6 +7,7 @@ const IntegerView = require('./Integer');
 const DecimalView = require('./Decimal');
 const BooleanView = require('./Boolean');
 const JSONBView = require('./JSONB');
+const ObjectView = require('./Object');
 const AutoIncrementView = require('./AutoIncrement');
 const PasswordView = require('./Password');
 const ImageView = require('./Image');
@@ -25,7 +26,7 @@ module.exports = {
   Decimal: DecimalView,
   Boolean: BooleanView,
   JSONB: JSONBView,
-  Object: JSONBView,
+  Object: ObjectView,
   AutoIncrement: AutoIncrementView,
   Password: PasswordView,
   Image: ImageView,
