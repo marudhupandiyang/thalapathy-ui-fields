@@ -314,7 +314,7 @@ class FileEdit extends React.Component {
                           <ListItemIcon>
                             <img
                               className={classes.previewImage}
-                              src={file.thumbnailUrl || file.dataUri}
+                              src={file.dataUri || `${file.path}/${file.name}`}
                             />
                           </ListItemIcon>
                           <div>
