@@ -20,7 +20,7 @@ class WYSIWYGEditor extends React.Component {
       editorState: EditorState.createEmpty(),
     };
 
-    const contentBlock = htmlToDraft(props.value);
+    const contentBlock = htmlToDraft(props.value || '');
     if (contentBlock) {
       const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
       const editorState = EditorState.createWithContent(contentState);
@@ -77,10 +77,48 @@ class WYSIWYGEditor extends React.Component {
             wrapperStyle={{ marginTop: '0.5rem', overflow: 'auto', height: '300px', border: '1px solid #00000015', borderRadius: '4px' }}
             editorStyle={{ padding: '0.5rem 1rem', height: 'calc(100% - 75px)' }}
             onEditorStateChange={this.onEditorStateChange}
-            value={value}
+            value={value || ''}
             toolbar={{
+              options: ['inline', 'fontSize', 'fontFamily', 'list', 'textAlign', 'colorPicker', 'link', 'image'],
+              inline: {
+                options: ['bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript'],
+              },
+               blockType: {
+                inDropdown: true,
+                options: ['Normal', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'Blockquote', 'Code'],
+              },
+              fontSize: {
+                options: [8, 9, 10, 11, 12, 14, 16, 18, 24, 30, 36, 48, 60, 72, 96],
+              },
+              list: {
+                 inDropdown: true,
+                options: ['unordered', 'ordered', 'indent', 'outdent'],
+              },
+              textAlign: {
+                inDropdown: true,
+                options: ['left', 'center', 'right', 'justify'],
+              },
+              colorPicker: {
+                colors: [],
+              },
+              image: {
+                urlEnabled: true,
+                urlEnabled: false,
+                alignmentEnabled: true,
+                previewImage: true,
+                defaultSize: {
+                  height: 'auto',
+                  width: 'auto',
+                },
+              },
+              link: {
+                inDropdown: true,
+                showOpenOptionOnHover: true,
+                defaultTargetOption: '_self',
+                options: ['link', 'unlink'],
+              },
               fontFamily: {
-                options: ['sans-serif'],
+                options: options.fontFamily || ['sans-serif'],
               },
             }}
             onBlur={() => {
