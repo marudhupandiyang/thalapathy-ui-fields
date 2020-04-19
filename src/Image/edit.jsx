@@ -26,6 +26,8 @@ import FileCopyIcon from '@material-ui/icons/FileCopy';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import DeleteIcon from '@material-ui/icons/Delete';
 import BackupIcon from '@material-ui/icons/Backup';
+import HttpIcon from '@material-ui/icons/Http';
+import InputAdornment from '@material-ui/core/InputAdornment';
 
 const styles = (theme) => ({
   root: {},
@@ -88,6 +90,15 @@ const styles = (theme) => ({
   error: {
     color: colors.red[600],
   },
+  urlUpload: {
+    margin: theme.spacing(2),
+  },
+  fileUploadPreviewImage: {
+    width: 'auto',
+    height: '300px',
+    display: 'block',
+    margin: theme.spacing(2)
+  },
 });
 
 const getExtension = (type) => {
@@ -109,6 +120,7 @@ class FileEdit extends React.Component {
     super(props);
     this.state = {
       tempValues: [],
+      uploadType: 'file',
     };
 
     this.filesAsDataURI = {};
@@ -214,6 +226,60 @@ class FileEdit extends React.Component {
     }
   };
 
+  onUrlChange = (imageUrl) => {
+    if (this.img)
+    this.setState({ fileValue: { uploadUrl: imageUrl }, isLoading: true, isInvalid: false });
+    const a = new Image();
+    this.img = a;
+    this.img.onload = (e) => {
+      if (a !== this.img) {
+        return;
+      }
+
+      var canvas = document.createElement('canvas');
+      canvas.width = this.img.naturalWidth; // or 'width' if you want a special/scaled size
+      canvas.height = this.img.naturalHeight; // or 'height' if you want a special/scaled size
+
+      canvas.getContext('2d').drawImage(this.img, 0, 0);
+
+      let name = (new URL(imageUrl)).pathname;
+      name = name.substr(name.lastIndexOf('/') + 1);
+      this.setState({
+        isLoading: false,
+        tempValues: [
+          ...this.state.tempValues,
+          {
+            name,
+            altName: name,
+            dataUri: canvas.toDataURL('image/png'),
+            uploadUrl: imageUrl,
+          },
+        ]
+      }, () => {
+        this.changePropValue();
+        this.img = undefined;
+      });
+    };
+
+    this.img.onerror = (e) => {
+      if (a !== this.img) {
+        return;
+      }
+
+      this.setState({
+        isLoading: false,
+        isInvalid: true,
+        fileValue: {
+          uploadUrl: imageUrl,
+        },
+      }, () => {
+        this.img = undefined;
+      });
+    }
+    this.img.crossOrigin = 'anonymous';
+    this.img.src = imageUrl;
+  }
+
   render() {
     const {
       error,
@@ -227,7 +293,10 @@ class FileEdit extends React.Component {
 
     const {
       value,
+      fileValue,
       tempValues,
+      uploadType,
+      isLoading,
     } = this.state;
 
     const usedLength = tempValues.length + value.length;
@@ -245,13 +314,36 @@ class FileEdit extends React.Component {
         >
           <Card>
             <CardHeader
-              classes={{ subheader: error && classes.error }}
+              className={{ subheader: error && classes.error }}
               title={displayName}
               subheader={helpText}
+              action={
+                !hasReachedLimit && <IconButton onClick={() => {
+                  this.setState({
+                    uploadType: uploadType === 'file' ? 'url' : 'file',
+                  });
+                }}>
+                  {uploadType === 'url' ?  <FileCopyIcon />: <HttpIcon />}
+                </IconButton>
+              }
             />
-
             {
-              !hasReachedLimit &&
+              !hasReachedLimit && (uploadType === 'url') &&
+                <>
+                  <TextField
+                    className={classes.urlUpload}
+                    fullWidth
+                    label="File Url"
+                    loading={isLoading}
+                    onChange={e => this.onUrlChange(e.target.value)}
+                    type="url"
+                    value={(fileValue && fileValue.uploadUrl) || ""}
+                    variant="outlined"
+                  />
+                </>
+              }
+            {
+              !hasReachedLimit && (uploadType === 'file') &&
               <Dropzone
                 onDrop={this.handleDrop}
                 onDropRejected={files => {
